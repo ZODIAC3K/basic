@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from fastapi.exceptions import RequestValidationError
 
 app = FastAPI()
@@ -27,7 +27,7 @@ class UserCreate(BaseModel):
     },
 )
 async def create_user(user: UserCreate, response: Response):
-    if user.name.strip() == "":
+    if user.name.strip() == "" or user.name is None:
         response.status_code = 400
         return {"error": "User name is required"} 
     response.status_code = 201
