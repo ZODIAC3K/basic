@@ -1,5 +1,5 @@
 [project]
-name = "fram-stack-basic"
+name = "farm-stack-basic"
 version = "0.1.0"
 description = ""
 authors = [
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "fram_stack_basic", from = "src"}]
+packages = [{include = "farm_stack_basic", from = "src"}]
 
 
 [build-system]
@@ -21,6 +21,6 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-dev = "run:main_dev"
-start = "run:main_prod"
+dev = "src.farm_stack_basic.run:main_dev"
+start = "src.farm_stack_basic.run:main_prod"
 
