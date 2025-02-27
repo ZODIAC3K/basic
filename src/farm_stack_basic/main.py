@@ -16,4 +16,4 @@ async def create_user(request: Request):
     userName = data.get("name")  # .get() is safer than data["name"] because it doesn't raise an error if the key doesn't exist so we need to check if userName is None
     if userName is None:
         return {"message": "User name is required"}
-    return {"message": f"User created: {userName}"}
+    return {"message": f"{userName} is created successfully"}
