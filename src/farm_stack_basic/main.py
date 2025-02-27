@@ -1,19 +1,50 @@
-"""
-This is a basic FastAPI application.
-"""
+from fastapi import FastAPI, Response, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ValidationError
+from fastapi.exceptions import RequestValidationError
 
-from fastapi import FastAPI, Request
+app = FastAPI()
 
-app = FastAPI(title="Fram Stack Basic", description="This is a basic FastAPI application.")
-
-@app.get("/")
+@app.get(
+    "/",
+    responses={
+        200: {"description": "Successful Response", "content": {"application/json": {"example": {"message": "Hello World"}}}},
+        404: {"description": "Not Found", "content": {"application/json": {"example": {"error": "Not Found"}}}},
+    },
+)
 def read_home():
     return {"message": "Hello World"}
 
-@app.post("/users")
-async def create_user(request: Request):
-    data = await request.json() # json is a dictionary in python and its automatically parsed in fastapi but not in django
-    userName = data.get("name")  # .get() is safer than data["name"] because it doesn't raise an error if the key doesn't exist so we need to check if userName is None
-    if userName is None:
-        return {"message": "User name is required"}
-    return {"message": f"{userName} is created successfully"}
+class UserCreate(BaseModel):
+    name: str
+
+@app.post(
+    "/users",
+    responses={
+        201: {"description": "User created successfully", "content": {"application/json": {"example": {"message": "John is created successfully"}}}},
+        400: {"description": "Bad Request - Missing or invalid name", "content": {"application/json": {"example": {"error": "User name is required"}}}},
+        422: {"description": "Validation Error", "content": {"application/json": {"example": {"error": "Invalid request format"}}}},
+    },
+)
+async def create_user(user: UserCreate, response: Response):
+    if user.name.strip() == "":
+        response.status_code = 400
+        return {"error": "User name is required"} 
+    response.status_code = 201
+    return {"message": f"{user.name} is created successfully"}
+
+# Custom 404 Not Found Error
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={"error": "Not Found"},
+    )
+
+# Custom 422 Validation Error Handler
+@app.exception_handler(RequestValidationError)
+async def custom_422_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"error": "Invalid request format"},
+    )
