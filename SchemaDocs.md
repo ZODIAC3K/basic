@@ -2,7 +2,7 @@
 
 #### Database Schema (dbdiagram.io format)
 
-```dbdiagram
+```sql
 Table User {
     ID String [pk]
     Email String [unique]
